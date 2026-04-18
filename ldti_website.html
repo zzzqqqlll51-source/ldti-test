@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>西南联大 LDTI 精神检定</title>
+  <style>
+    :root {
+      --bg: #f5efe2;
+      --paper: rgba(252, 247, 238, 0.92);
+      --ink: #2d241c;
+      --muted: #6a5b4b;
+      --line: #d5c4ab;
+      --accent: #8b2e1f;
+      --accent-2: #b24834;
+      --gold: #8c6b2a;
+      --shadow: 0 16px 40px rgba(60, 38, 14, 0.14);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+      background:
+        radial-gradient(circle at top, rgba(139,46,31,0.06), transparent 28%),
+        linear-gradient(180deg, #f7f2e8 0%, #efe3cf 100%);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .bg-texture::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(80,50,20,0.02) 0px,
+          rgba(80,50,20,0.02) 1px,
+          transparent 1px,
+          transparent 4px
+        );
+      opacity: 0.5;
+    }
+
+    .app {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+
+    .card {
+      position: relative;
+      background: var(--paper);
+      border: 1.5px solid rgba(139, 46, 31, 0.14);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(2px);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border: 1px solid rgba(140, 107, 42, 0.16);
+      border-radius: calc(var(--radius) - 10px);
+      pointer-events: none;
+    }
+
+    .hero {
+      padding: 44px 28px 36px;
+      min-height: calc(100vh - 88px);
+      display: grid;
+      place-items: center;
+    }
+
+    .hero-inner {
+      width: 100%;
+      max-width: 760px;
+      text-align: center;
+      padding: 42px 24px 34px;
+      background:
+        linear-gradient(135deg, rgba(139,46,31,0.06), rgba(255,255,255,0) 45%),
+        var(--paper);
+    }
+
+    .stamp {
+      display: inline-block;
+      color: var(--accent);
+      border: 2px solid rgba(139,46,31,0.45);
+      border-radius: 999px;
+      padding: 6px 16px;
+      letter-spacing: 0.18em;
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    .title {
+      font-size: clamp(32px, 5vw, 52px);
+      line-height: 1.18;
+      letter-spacing: 0.06em;
+    }
+
+    .subtitle {
+      margin-top: 12px;
+      font-size: clamp(16px, 2.6vw, 22px);
+      color: var(--gold);
+      letter-spacing: 0.12em;
+    }
+
+    .intro {
+      margin: 26px auto 0;
+      max-width: 620px;
+      font-size: 17px;
+      line-height: 1.9;
+      color: var(--muted);
+      text-align: justify;
+    }
+
+    .actions {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      font: inherit;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .primary {
+      background: linear-gradient(180deg, var(--accent-2), var(--accent));
+      color: #fffaf4;
+      padding: 14px 24px;
+      border-radius: 999px;
+      box-shadow: 0 10px 24px rgba(139,46,31,0.22);
+    }
+
+    .secondary {
+      background: rgba(139,46,31,0.06);
+      color: var(--accent);
+      padding: 14px 24px;
+      border: 1px solid rgba(139,46,31,0.2);
+      border-radius: 999px;
+    }
+
+    .panel {
+      padding: 26px 22px 28px;
+      margin-top: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .progress-text {
+      color: var(--muted);
+      font-size: 14px;
+      letter-spacing: 0.06em;
+    }
+
+    .progress {
+      width: min(320px, 100%);
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(139,46,31,0.08);
+      overflow: hidden;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--accent));
+      border-radius: inherit;
+      transition: width 0.28s ease;
+    }
+
+    .question-tag {
+      display: inline-block;
+      color: var(--accent);
+      border-left: 4px solid var(--accent);
+      padding-left: 10px;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .question-title {
+      font-size: clamp(24px, 4vw, 34px);
+      line-height: 1.5;
+    }
+
+    .options {
+      margin-top: 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .option {
+      text-align: left;
+      padding: 18px 18px 18px 20px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.62);
+      border: 1.5px solid rgba(139,46,31,0.12);
+      box-shadow: 0 8px 20px rgba(60, 38, 14, 0.06);
+      color: inherit;
+      width: 100%;
+    }
+
+    .option:hover {
+      background: rgba(255,255,255,0.95);
+      border-color: rgba(139,46,31,0.28);
+    }
+
+    .option-code {
+      color: var(--accent);
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .option-title {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .option-desc {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.85;
+    }
+
+    .result-wrap {
+      padding: 26px 22px 30px;
+      margin-top: 18px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 70px 20px;
+    }
+
+    .loading h3 {
+      font-size: 30px;
+      margin-bottom: 16px;
+    }
+
+    .loading p {
+      color: var(--muted);
+      line-height: 1.9;
+    }
+
+    .dots::after {
+      content: "";
+      display: inline-block;
+      width: 1em;
+      text-align: left;
+      animation: dots 1.2s steps(4, end) infinite;
+      overflow: hidden;
+      vertical-align: bottom;
+    }
+
+    @keyframes dots {
+      0% { content: ""; }
+      25% { content: "."; }
+      50% { content: ".."; }
+      75% { content: "..."; }
+      100% { content: ""; }
+    }
+
+    .result-header {
+      display: grid;
+      gap: 18px;
+    }
+
+    .result-topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .result-type {
+      font-size: clamp(34px, 5vw, 52px);
+      line-height: 1.18;
+      letter-spacing: 0.08em;
+    }
+
+    .badge {
+      border: 1.5px solid rgba(139,46,31,0.24);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 14px;
+      background: rgba(139,46,31,0.05);
+      white-space: nowrap;
+    }
+
+    .result-person {
+      font-size: 22px;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+    }
+
+    .quote-block, .skill-block, .similar-block, .share-block {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.56);
+      border: 1px solid rgba(139,46,31,0.1);
+    }
+
+    .judgement {
+      font-size: 18px;
+      line-height: 2;
+      margin-top: 10px;
+    }
+
+    .section-label {
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .quote-text {
+      font-size: 20px;
+      line-height: 1.9;
+      font-style: italic;
+    }
+
+    .small-text {
+      color: var(--muted);
+      line-height: 1.9;
+      font-size: 15px;
+    }
+
+    .code-line {
+      font-size: 14px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    .result-actions {
+      margin-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 640px) {
+      .hero { padding: 12px 0 30px; min-height: auto; }
+      .hero-inner { padding: 34px 18px 28px; }
+      .title { letter-spacing: 0.03em; }
+      .panel, .result-wrap { padding: 20px 16px 22px; }
+      .option-title { font-size: 20px; }
+      .quote-text { font-size: 18px; }
+    }
+  </style>
+</head>
+<body class="bg-texture">
+  <div class="app" id="app"></div>
+
+  <script>
+    const questions = [
+      {
+        dim: 'L',
+        title: '国难当头，你认为最紧迫的事情是什么？',
+        options: [
+          {
+            key: 'A',
+            title: '📜 守住根脉',
+            desc: '保护好我们的文化、典籍和学术传统，只要文脉不断，民族就不会亡。'
+          },
+          {
+            key: 'B',
+            title: '🔥 开辟新路',
+            desc: '投身更广阔的社会实践，在行动中找到救国之路，哪怕筚路蓝缕、从零开始。'
+          }
+        ]
+      },
+      {
+        dim: 'D',
+        title: '你更倾向于用什么样的方式理解世界？',
+        options: [
+          {
+            key: 'A',
+            title: '🏠 书斋深耕',
+            desc: '在静思和钻研中与先贤对话，从经典里寻找答案，用学术为时代把脉。'
+          },
+          {
+            key: 'B',
+            title: '🌾 走向田野',
+            desc: '走到乡村、工厂、前线去，在真实的社会里发现问题，在行动中检验真理。'
+          }
+        ]
+      },
+      {
+        dim: 'T',
+        title: '面对巨大的困境和压力，你的内心更接近以下哪种状态？',
+        options: [
+          {
+            key: 'A',
+            title: '🧠 理性沉静',
+            desc: '越是动荡，越要保持清醒的头脑，用冷静的分析和缜密的思考来应对一切。'
+          },
+          {
+            key: 'B',
+            title: '❤️ 热血激昂',
+            desc: '心中有火，眼里有光，愿意用澎湃的热情和不屈的斗志去感染和改变世界。'
+          }
+        ]
+      },
+      {
+        dim: 'I',
+        title: '如果让你选择一种方式报国，你会？',
+        options: [
+          {
+            key: 'A',
+            title: '✍️ 执笔为刃',
+            desc: '用文字记录时代，用思想启迪人心，用学术为民族铸魂。'
+          },
+          {
+            key: 'B',
+            title: '🛡️ 持剑为犁',
+            desc: '用双手建设国家，用行动守护山河，用实干和创造改变现实。'
+          }
+        ]
+      }
+    ];
+
+    const results = {
+      'AAAA': {
+        type: '守藏者', person: '汪曾祺',
+        judgement: '你用文字腌制时光，在炮火中为日常赋形，让后世看见乱世里的烟火人间。',
+        quote: '我生活得最久，接受影响最深，使我成为这样一个人，这样一个作家——不是另一个作家的地方，是西南联大。',
+        skill: '能在任何艰苦环境下找到好吃的，并写800字点评。',
+        similar: '与你同一禀赋者——陈寅恪（铸魂）、钱穆（深耕）、穆旦（歌咏）。你们在乱世中守住了文字、记忆与日常，让文化的毛细血管不曾断裂。'
+      },
+      'AAAB': {
+        type: '传灯者', person: '梅贻琦',
+        judgement: '你是沉默的掌灯人，用毁家纾难的担当，护住了中国教育最暗时刻的火种。',
+        quote: '所谓大学者，非谓有大楼之谓也，有大师之谓也。',
+        skill: '沉默时比说话时有力量，说话时比沉默时有分量。',
+        similar: '与你同一禀赋者——周培源（筑基）、陈寅恪（铸魂）、钱穆（深耕）。你们是沉默的托举者，不站在光里，但光因你们而在。'
+      },
+      'AABA': {
+        type: '铸魂者', person: '陈寅恪',
+        judgement: '你以病眼守史册，用“独立之精神，自由之思想”为中国学人立下千年坐标。',
+        quote: '独立之精神，自由之思想，历千万祀，与天壤而同久，共三光而永光。',
+        skill: '眼睛不好，但比谁都看得透。',
+        similar: '与你同一禀赋者——钱穆（深耕）、冯友兰（求真）、汪曾祺（守藏）。你们用学术为民族立心，在最暗的夜里守护着“独立”与“自由”的火种。'
+      },
+      'AABB': {
+        type: '燃灯者', person: '闻一多',
+        judgement: '你是红烛，烧破世人的梦，烧沸世人的血——从书斋到街头，你用生命做了最后一次演讲。',
+        quote: '莫问收获，但问耕耘。',
+        skill: '能把《楚辞》讲成热血番，能把街头讲成课堂。',
+        similar: '与你同一禀赋者——穆旦（歌咏）、费孝通（躬行）、郭永怀（隐耀）。你们心中有火，眼里有光，用生命践行了“诗人主要的天赋是爱他的祖国”。'
+      },
+      'ABAA': {
+        type: '深耕者', person: '钱穆',
+        judgement: '你在炮火中梳理国史脉络，为故国招魂，让千年文脉在乱世中不绝如缕。',
+        quote: '对其本国已往历史有一种温情与敬意者，至少不会对其本国历史抱一种偏激的虚无主义。',
+        skill: '能把五千年历史讲得比小说还好看。',
+        similar: '与你同一禀赋者——陈寅恪（铸魂）、冯友兰（求真）、汪曾祺（守藏）。你们在炮火中梳理国史脉络，让千年文脉不绝如缕。'
+      },
+      'ABAB': {
+        type: '筑基者', person: '周培源',
+        judgement: '你用手写讲义在铁皮屋顶下讲授理论力学，为新中国培养了一代又一代科学栋梁。',
+        quote: '科学没有国界，但科学家有祖国。',
+        skill: '用手写讲义教会学生造原子弹，真正的“理论指导实践”。',
+        similar: '与你同一禀赋者——梅贻琦（传灯）、曾昭伦（破壁）、赵忠尧（追光）。你们站在讲台上，用手写讲义和粉笔灰，为国家筑起了科学的基石。'
+      },
+      'ABBA': {
+        type: '求真者', person: '冯友兰',
+        judgement: '你在硝烟中写就《贞元六书》，用哲学为民族寻路，坚信“旧邦新命”终将到来。',
+        quote: '阐旧邦以辅新命，极高明而道中庸。',
+        skill: '被炸了还写哲学，哲学家的心态管理大师。',
+        similar: '与你同一禀赋者——陈寅恪（铸魂）、钱穆（深耕）、黄昆（拓荒）。你们在硝烟中追问“旧邦新命”，用哲学和思想为民族寻路。'
+      },
+      'ABBB': {
+        type: '拓荒者', person: '黄昆',
+        judgement: '你平视爱因斯坦，在中国半导体领域开荒拓土，让“毫无创新”四字成了最狂傲的青春宣言。',
+        quote: '我文献看得比较少，因为那样容易被人牵着鼻子走，变成书本的奴隶。我喜欢与众不同，不喜欢随大流。如果跟着大家做，就没有什么意思。',
+        skill: '二十岁就敢锐评爱因斯坦（虽然那句“毫无创新”是杨振宁说的，但话题是你挑起的啊喂！），关键是挑对了。',
+        similar: '与你同一禀赋者——杨振宁（摘星）、赵忠尧（追光）、曾昭伦（破壁）。你们二十多岁就敢平视世界，然后用一辈子证明：狂是年轻人的特权，但你们配得上。'
+      },
+      'BAAA': {
+        type: '追光者', person: '赵忠尧',
+        judgement: '你扮作难民，把镭抱在怀里千里独行——胸膛的血印，是中国核物理的第一块基石。',
+        quote: '那50毫克镭，就是中国核物理的命脉火种。',
+        skill: '咸菜坛子物理学派创始人。',
+        similar: '与你同一禀赋者——邓稼先（筑盾）、郭永怀（隐耀）、王淦昌（报国）。你们把中国核物理的火种抱在怀里，千里独行，胸膛的血印就是第一块基石。'
+      },
+      'BAAB': {
+        type: '筑盾者', person: '邓稼先',
+        judgement: '父亲说“学科学为国家”，你把这句话铸成了罗布泊上空那朵让中国人挺直腰的蘑菇云。',
+        quote: '要是有来世，我还是选择中国，选择核武器事业，选择你！',
+        skill: '罗布泊最熟悉的陌生人。',
+        similar: '与你同一禀赋者——郭永怀（隐耀）、王淦昌（报国）、赵忠尧（追光）。你们在罗布泊的戈壁滩上，用青春和健康换来了让全中国挺直腰的那一声巨响。'
+      },
+      'BABA': {
+        type: '隐耀者', person: '郭永怀',
+        judgement: '你在坠机瞬间与警卫员紧抱公文包，用生命护住核试验数据——功勋背后，是无声的牺牲。',
+        quote: '我作为一个中国人，有责任回到祖国，和人民一道，共同建设我们美丽的山河。',
+        skill: '用生命做数据备份（但只能使用一次）。',
+        similar: '与你同一禀赋者——邓稼先（筑盾）、王淦昌（报国）、赵忠尧（追光）。你们的名字很长时间不为人知，但你们用生命护住的数据，成了共和国最坚固的盾。'
+      },
+      'BABB': {
+        type: '报国者', person: '王淦昌',
+        judgement: '你三次转向科研方向，只为国家需要——“我愿以身许国”，是你用一生践行的诺言。',
+        quote: '我愿以身许国。',
+        skill: '国家需要什么，我就是什么学家。',
+        similar: '与你同一禀赋者——邓稼先（筑盾）、郭永怀（隐耀）、赵忠尧（追光）。你们一辈子可能换了好几个研究方向，但方向永远只有一个：国家需要。'
+      },
+      'BBAA': {
+        type: '躬行者', person: '费孝通',
+        judgement: '你跳出书斋，用脚步丈量云南乡村，让社会学从象牙塔走向田野，为乡土中国画像。',
+        quote: '各美其美，美人之美，美美与共，天下大同。',
+        skill: '社会学界的种地能手。',
+        similar: '与你同一禀赋者——闻一多（燃灯）、曾昭伦（破壁）、穆旦（歌咏）。你们不满足于书斋里的学问，偏要走到田野和街头去，在泥土里种出社会学的果实。'
+      },
+      'BBAB': {
+        type: '破壁者', person: '曾昭伦',
+        judgement: '你在简陋实验室里坚持化学研究，用一支试管、一把量杯，为中国现代化学奠基。',
+        quote: '科学研究的道路从来不是平坦的，但只要有决心，总能走出一条路来。',
+        skill: '试管不够，手艺来凑。',
+        similar: '与你同一禀赋者——周培源（筑基）、黄昆（拓荒）、费孝通（躬行）。你们在连试管都凑不齐的条件下搞科研，硬是为中国现代科学开出了一条路。'
+      },
+      'BBBA': {
+        type: '歌咏者', person: '穆旦',
+        judgement: '你在野人山的死亡行军中幸存，用诗歌为一代青年立碑，让苦难有了不朽的回声。',
+        quote: '这才知道我全部的努力，不过完成了普通的生活。',
+        skill: '把战争写成诗，让和平年代的人出冷汗。',
+        similar: '与你同一禀赋者——闻一多（燃灯）、汪曾祺（守藏）、费孝通（躬行）。你们把战争、死亡和流亡写成诗，让后来的人在和平年代读到时，依然会打个寒战。'
+      },
+      'BBBB': {
+        type: '摘星者', person: '杨振宁',
+        judgement: '你在茅草屋里和同学争论爱因斯坦，三十年后从斯德哥尔摩捧回了属于中国人的星辰。',
+        quote: '宁拙毋巧，宁朴毋华。',
+        skill: '从茅草屋到斯德哥尔摩，路径规划大师；锐评大师（那句“毫无创新”就是你说的）。',
+        similar: '与你同一禀赋者——黄昆（拓荒）、邓稼先（筑盾）、赵忠尧（追光）。你们从茅草屋出发，走向世界最高的学术殿堂，然后告诉所有人：中国人，可以。'
+      }
+    };
+
+    const state = {
+      screen: 'home',
+      step: 0,
+      answers: [],
+      loading: false,
+      result: null
+    };
+
+    const app = document.getElementById('app');
+
+    function render() {
+      if (state.screen === 'home') return renderHome();
+      if (state.screen === 'quiz') return renderQuiz();
+      if (state.screen === 'result') return renderResult();
+    }
+
+    function renderHome() {
+      app.innerHTML = `
+        <section class="hero">
+          <div class="card hero-inner">
+            <div class="stamp">西南联大训导处 谨启</div>
+            <h1 class="title">联大入学档案 · LDTI精神分选</h1>
+            <p class="subtitle">刚毅坚卓检定报告</p>
+            <p class="intro">
+              同学惠鉴：时局板荡，学风愈坚。校务处特拟心志问卷四则，以观诸生秉性。请据实勾选，以便分科因材施教。<br>
+              完成检定后，你将获得一份专属的联大精神档案，匹配与你气质相近的西南联大先贤人物。
+            </p>
+            <div class="actions">
+              <button class="primary" onclick="startQuiz()">领取入学迁移证</button>
+              <button class="secondary" onclick="scrollToHow()">先看说明</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="how" class="card panel">
+          <div class="question-tag">检定说明</div>
+          <h2 class="question-title">四问定谱系，片刻见精神</h2>
+          <div class="quote-block">
+            <div class="section-label">说明</div>
+            <p class="small-text">本检定共 4 题，每题 2 个选项。请选择更符合你直觉的一项。完成后将生成你的专属联大精神档案，并匹配一位与你气质相近的西南联大人物。</p>
+          </div>
+        </section>
+
+        
+      `;
+    }
+
+    function renderQuiz() {
+      const q = questions[state.step];
+      const progress = ((state.step + 1) / questions.length) * 100;
+      app.innerHTML = `
+        <section class="card panel">
+          <div class="topbar">
+            <div class="progress-text">LDTI 精神检定 · 第 ${state.step + 1} / ${questions.length} 题</div>
+            <div class="progress"><span style="width:${progress}%"></span></div>
+          </div>
+          <div class="question-tag">${q.dim} 维度</div>
+          <h2 class="question-title">${q.title}</h2>
+          <div class="options">
+            ${q.options.map(opt => `
+              <button class="option" onclick="selectAnswer('${opt.key}')">
+                <div class="option-code">选择 ${opt.key}</div>
+                <div class="option-title">${opt.title}</div>
+                <div class="option-desc">${opt.desc}</div>
+              </button>
+            `).join('')}
+          </div>
+          <div class="footer-note">提示：本测试更注重精神取向与气质代入，并非严格学术分类。请选择你最本能想选的一项即可。</div>
+        </section>
+      `;
+    }
+
+    function renderResult() {
+      if (state.loading) {
+        app.innerHTML = `
+          <section class="card result-wrap">
+            <div class="loading">
+              <h3>档案调取中<span class="dots"></span></h3>
+              <p>正在匹配联大精神谱系，请稍候。<br>训导处正在为你生成专属检定报告。</p>
+            </div>
+          </section>
+        `;
+        return;
+      }
+
+      const r = state.result;
+      const code = state.answers.join('');
+      const shareText = `我在西南联大LDTI精神检定中，被分入 ${r.type}·${r.person} 门下。\n“${r.quote}”\n你呢？来测测你是联大哪位先贤。`;
+
+      app.innerHTML = `
+        <section class="card result-wrap" id="result-card">
+          <div class="result-header">
+            <div class="result-topline">
+              <div>
+                <div class="code-line">联大入学档案 · 检定编码 ${code}</div>
+                <h1 class="result-type">${r.type}</h1>
+                <div class="result-person">代表人物：${r.person}</div>
+              </div>
+              <div class="badge">刚毅坚卓 检定完成</div>
+            </div>
+            <div class="quote-block">
+              <div class="section-label">一句话判词</div>
+              <p class="judgement">${r.judgement}</p>
+            </div>
+            <div class="quote-block">
+              <div class="section-label">人物金句</div>
+              <p class="quote-text">“${r.quote}”</p>
+            </div>
+            <div class="skill-block">
+              <div class="section-label">隐藏技能</div>
+              <p class="small-text">✨ ${r.skill}</p>
+            </div>
+            <div class="similar-block">
+              <div class="section-label">同学录</div>
+              <p class="small-text">${r.similar}</p>
+            </div>
+            <div class="share-block">
+              <div class="section-label">分享文案</div>
+              <p class="small-text" id="share-copy">我在西南联大LDTI精神检定中，被分入 <span style="color: var(--accent); font-weight: 700;">${r.type}·${r.person}</span> 门下。<br>“${r.quote}”<br>你呢？来测测你是联大哪位先贤。</p>
+            </div>
+          </div>
+          <div class="result-actions">
+            <button class="primary" onclick="saveReport()">保存检定报告</button>
+            <button class="secondary" onclick="restartQuiz()">重新检定</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function startQuiz() {
+      state.screen = 'quiz';
+      state.step = 0;
+      state.answers = [];
+      state.loading = false;
+      state.result = null;
+      render();
+    }
+
+    function selectAnswer(key) {
+      state.answers.push(key);
+      if (state.step < questions.length - 1) {
+        state.step += 1;
+        render();
+      } else {
+        const code = state.answers.join('');
+        state.screen = 'result';
+        state.loading = true;
+        render();
+        setTimeout(() => {
+          state.result = results[code];
+          state.loading = false;
+          render();
+        }, 1300);
+      }
+    }
+
+    function restartQuiz() {
+      state.screen = 'home';
+      state.step = 0;
+      state.answers = [];
+      state.loading = false;
+      state.result = null;
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function saveReport() {
+      const card = document.getElementById('result-card');
+      if (!card) return;
+
+      try {
+        const canvas = await html2canvas(card, {
+          backgroundColor: '#fcf7ee',
+          scale: Math.min(window.devicePixelRatio || 2, 3),
+          useCORS: true
+        });
+
+        const link = document.createElement('a');
+        const safeType = state.result ? state.result.type : 'LDTI';
+        const safePerson = state.result ? state.result.person : 'report';
+        link.download = `联大LDTI检定报告-${safeType}-${safePerson}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (err) {
+        alert('保存失败，请直接使用系统截图。');
+      }
+    }
+
+    function scrollToHow() {
+      const el = document.getElementById('how');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: document.body.scrollHeight * 0.25, behavior: 'smooth' });
+      }
+    }
+
+    window.startQuiz = startQuiz;
+    window.selectAnswer = selectAnswer;
+    window.restartQuiz = restartQuiz;
+    window.saveReport = saveReport;
+    window.scrollToHow = scrollToHow;
+
+    render();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</body>
+</html>
